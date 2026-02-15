@@ -28,7 +28,7 @@ public class UserController {
         return userService.updateUser(userId, userDto);
     }
 
-    @GetMapping
+    @GetMapping("/{userId}")
     public UserDto getUserById(@PathVariable Long userId) {
         return userService.getUserById(userId);
     }
