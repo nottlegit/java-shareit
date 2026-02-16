@@ -29,4 +29,16 @@ public class ErrorHandler {
         log.error("Внутренняя ошибка сервера: ", e);
         return new ErrorResponse("Произошла непредвиденная ошибка");
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleAccessDeniedException(AccessDeniedException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleOtherExceptions(Exception e) {
+        return new ErrorResponse("Произошла внутренняя ошибка сервера");
+    }
 }

@@ -8,7 +8,6 @@ import ru.practicum.shareit.item.model.Item;
 public class ItemMapper {
     public static Item toItem(ItemDto itemDto, Long ownerId) {
         return Item.builder()
-                .id(itemDto.getId())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
@@ -23,21 +22,5 @@ public class ItemMapper {
                 .description(item.getDescription())
                 .available(item.getAvailable())
                 .build();
-    }
-
-    public static Item updateItemFields(Item item, ItemDto itemDto) {
-        Item.ItemBuilder builder = item.toBuilder();
-
-        if (itemDto.hasName()) {
-            builder.name(itemDto.getName());
-        }
-        if (itemDto.hasDescription()) {
-            builder.description(itemDto.getDescription());
-        }
-        if (itemDto.hasAvailable()) {
-            builder.available(itemDto.getAvailable());
-        }
-
-        return builder.build();
     }
 }

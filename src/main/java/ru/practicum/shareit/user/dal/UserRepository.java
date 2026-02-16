@@ -15,7 +15,7 @@ public class UserRepository {
     private final HashMap<Long, User> users;
 
     public Optional<User> findOne(Long userId) {
-        return Optional.of(users.get(userId));
+        return Optional.ofNullable(users.get(userId));
     }
 
     public Optional<User> findByEmail(String email) {

@@ -16,13 +16,15 @@ public class ItemRepository {
     private final HashMap<Long, Item> items;
 
     public Item save(Item item) {
+        if (item.getId() == null) {
+            throw new IllegalArgumentException("ID не может быть null");
+        }
         items.put(item.getId(), item);
-
         return item;
     }
 
     public Optional<Item> findOne(Long itemId) {
-        return Optional.of(items.get(itemId));
+        return Optional.ofNullable(items.get(itemId));
     }
 
     public Collection<Item> findAll() {

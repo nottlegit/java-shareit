@@ -21,16 +21,4 @@ public class ItemDto {
 
     @NotNull(message = "Статус должен быть указан")
     private Boolean available;
-
-    public Boolean hasName() {
-        return !(name == null || name.isBlank());
-    }
-
-    public Boolean hasDescription() {
-        return !(description == null || description.isBlank());
-    }
-
-    public Boolean hasAvailable() {
-        return available != null;
-    }
 }
