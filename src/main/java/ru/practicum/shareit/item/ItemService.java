@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -15,7 +14,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -81,13 +79,13 @@ public class ItemService {
         return result;
     }
 
-    public ItemDto getItemById(Long userId, Long itemId) {
+    public ItemDto getItemById(Long itemId) {
         Item item = findItemById(itemId);
 
         return ItemMapper.toItemDto(item);
     }
 
-    public Collection<ItemDto> getItemsByOwner(Long userId)  {
+    public Collection<ItemDto> getItemsByOwner(Long userId) {
         userService.getUserById(userId);
 
         return itemRepository.findAll().stream()
@@ -105,7 +103,7 @@ public class ItemService {
                 .filter(Item::getAvailable)
                 .filter(
                         item -> item.getName().toLowerCase().contains(text.toLowerCase())
-                        || item.getDescription().toLowerCase().contains(text.toLowerCase())
+                                || item.getDescription().toLowerCase().contains(text.toLowerCase())
                 )
                 .map(ItemMapper::toItemDto)
                 .toList();

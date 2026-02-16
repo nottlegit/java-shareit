@@ -2,7 +2,6 @@ package ru.practicum.shareit.user.dal;
 
 import lombok.Data;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;

@@ -2,8 +2,6 @@ package ru.practicum.shareit.item.dal;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.item.ItemController;
-import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
