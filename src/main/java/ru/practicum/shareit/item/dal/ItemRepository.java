@@ -5,13 +5,13 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
 public class ItemRepository {
-    private final HashMap<Long, Item> items;
+    private final Map<Long, Item> items;
 
     public Item save(Item item) {
         if (item.getId() == null) {

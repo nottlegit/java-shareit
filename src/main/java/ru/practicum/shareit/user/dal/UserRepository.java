@@ -5,13 +5,13 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Data
 @Repository
 public class UserRepository {
-    private final HashMap<Long, User> users;
+    private final Map<Long, User> users;
 
     public Optional<User> findOne(Long userId) {
         return Optional.ofNullable(users.get(userId));
