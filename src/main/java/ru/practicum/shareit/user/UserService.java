@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final AtomicLong idGenerator;
+    private final AtomicLong idGenerator = new AtomicLong(0);
 
     public UserDto createUser(UserDto userDto) {
         userRepository.findByEmail(userDto.getEmail()).ifPresent(u -> {

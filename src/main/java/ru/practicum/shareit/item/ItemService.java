@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ItemService {
     private final ItemRepository itemRepository;
     private final UserService userService;
-    private final AtomicLong idGenerator;
+    private final AtomicLong idGenerator = new AtomicLong(0);
 
     public ItemDto createItem(Long userId, ItemDto itemDto) {
         UserDto user = userService.getUserById(userId);
