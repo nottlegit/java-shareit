@@ -14,9 +14,9 @@ public class UserMapper {
                 .build();
     }
 
-    public static User updateUserFields(Long userId, UserDto userDto) {
+    public static User mapToUser(UserDto userDto) {
         return User.builder()
-                .id(userId)
+                .id(userDto.getId())
                 .name(userDto.getName())
                 .email(userDto.getEmail())
                 .build();

@@ -1,14 +1,43 @@
 package ru.practicum.shareit.user.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.*;
+import lombok.*;
+import ru.practicum.shareit.item.model.Item;
 
-@Data
-@EqualsAndHashCode(of = {"email"})
+import java.util.ArrayList;
+import java.util.Collection;
+
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = {"email"})
 public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Collection<Item> items = new ArrayList<>();
+
+    public void addItem(Item item) {
+        items.add(item);
+        item.setOwner(this);
+    }
+
+    public void removeItem(Item item) {
+        items.remove(item);
+        item.setOwner(null);
+    }
 }

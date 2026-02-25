@@ -8,12 +8,12 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dal.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Service
@@ -21,14 +21,12 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ItemService {
     private final ItemRepository itemRepository;
     private final UserService userService;
-    private final AtomicLong idGenerator = new AtomicLong(0);
 
     public ItemDto createItem(Long userId, ItemDto itemDto) {
-        UserDto user = userService.getUserById(userId);
-        log.info("Пользователь найден: {}", user);
+        UserDto userDto = userService.getUserById(userId);
+        log.info("Пользователь найден: {}", userDto);
 
-        Item item = ItemMapper.toItem(itemDto, userId);
-        item = item.toBuilder().id(idGenerator.getAndIncrement()).build();
+        Item item = ItemMapper.toItem(itemDto, UserMapper.mapToUser(userDto));
         item = itemRepository.save(item);
 
         log.info("Вещь создана с id: {}", item.getId());
@@ -37,11 +35,11 @@ public class ItemService {
 
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
         Item item = findItemById(itemId);
-        log.info("Найдена вещь: {}, владелец: {}", item, item.getOwnerId());
+        log.info("Найдена вещь: {}, владелец: {}", item, item.getOwner().getId());
 
-        if (!item.getOwnerId().equals(userId)) {
+        if (!item.getOwner().getId().equals(userId)) {
             log.warn("Пользователь {} не является владельцем вещи {}. Владелец: {}",
-                    userId, itemId, item.getOwnerId());
+                    userId, itemId, item.getOwner().getId());
             throw new AccessDeniedException("Только владелец может редактировать вещь");
         }
 
@@ -88,8 +86,7 @@ public class ItemService {
     public Collection<ItemDto> getItemsByOwner(Long userId) {
         userService.getUserById(userId);
 
-        return itemRepository.findAll().stream()
-                .filter(item -> item.getOwnerId().equals(userId))
+        return itemRepository.findByOwnerId(userId).stream()
                 .map(ItemMapper::toItemDto)
                 .toList();
     }
@@ -99,18 +96,13 @@ public class ItemService {
             return List.of();
         }
 
-        return itemRepository.findAll().stream()
-                .filter(Item::getAvailable)
-                .filter(
-                        item -> item.getName().toLowerCase().contains(text.toLowerCase())
-                                || item.getDescription().toLowerCase().contains(text.toLowerCase())
-                )
+        return itemRepository.searchAvailableItems(text).stream()
                 .map(ItemMapper::toItemDto)
                 .toList();
     }
 
     private Item findItemById(Long itemId) {
-        return itemRepository.findOne(itemId).orElseThrow(() ->
+        return itemRepository.findById(itemId).orElseThrow(() ->
                 new NotFoundException(
                         String.format("Вещь с id: %d не найдена", itemId)
                 )
