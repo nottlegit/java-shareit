@@ -2,7 +2,11 @@ package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.user.model.User;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 @Entity
@@ -30,4 +34,8 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Collection<Booking> bookings = new ArrayList<>();
 }

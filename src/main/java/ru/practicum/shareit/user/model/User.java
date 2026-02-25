@@ -30,14 +30,4 @@ public class User {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Collection<Item> items = new ArrayList<>();
-
-    public void addItem(Item item) {
-        items.add(item);
-        item.setOwner(this);
-    }
-
-    public void removeItem(Item item) {
-        items.remove(item);
-        item.setOwner(null);
-    }
 }
