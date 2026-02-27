@@ -3,8 +3,9 @@ package ru.practicum.shareit.booking;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bookings")
@@ -20,12 +21,20 @@ public class Booking {
     private Long id;
 
     @Column(nullable = false)
-    private OffsetDateTime start;
+    private LocalDateTime start;
 
     @Column(nullable = false)
-    private OffsetDateTime end;
+    private LocalDateTime end;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "id", nullable = false)
     private Item item;
+
+    @ManyToOne
+    @JoinColumn(name = "owner", nullable = false)
+    private User booker;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private BookingStatus status;
 }
