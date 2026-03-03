@@ -23,9 +23,5 @@ public class BookingDto {
     private LocalDateTime end;
 
     @NotNull(message = "ID вещи должно быть указано")
-    private Long itemID;
-
-    /*private BookingStatus status;
-    private ItemDto item;
-    private UserDto booker;*/
+    private Long itemId;
 }

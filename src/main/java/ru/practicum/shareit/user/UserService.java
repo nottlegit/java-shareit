@@ -56,11 +56,7 @@ public class UserService {
     }
 
     public UserDto getUserById(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(
-                        String.format("Пользователь с id: %d не найден", userId)
-                )
-        );
+        User user = findUserByIdOrThrow(userId);
 
         return UserMapper.mapToUserDto(user);
     }
@@ -81,21 +77,14 @@ public class UserService {
                 )
         );
 
-        //user.getItems().clear();
-
         userRepository.delete(user);
     }
 
-    /*
-    @Transactional
-    public void deleteUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
-
-        // Очищаем связи перед удалением
-        user.getItems().clear();  // если есть связь OneToMany
-
-        userRepository.delete(user);
+    public User findUserByIdOrThrow(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException(
+                        String.format("Пользователь с id: %d не найден", userId)
+                )
+        );
     }
-    */
 }

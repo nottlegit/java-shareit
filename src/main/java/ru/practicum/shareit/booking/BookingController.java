@@ -1,9 +1,16 @@
 package ru.practicum.shareit.booking;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
+ import ru.practicum.shareit.booking.dto.BookingResponseDto;
+ import ru.practicum.shareit.exception.ValidationException;
 
+import java.util.Collection;
+
+@Slf4j
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
@@ -12,27 +19,55 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public BookingDto createBooking(
+    public BookingResponseDto createBooking(
             @RequestHeader(RESPONSE_HEADER) Long userId,
-            @RequestBody BookingDto bookingDto) {
-        return bookingService.createBooking(userId, bookingDto);
+            @RequestBody @Valid BookingDto bookingDto) {
+        log.info("Получен запрос от пользователя: {}. На бронирование вещи: {}.", userId, bookingDto.getItemId());
+        return bookingService.createBooking(bookingDto, userId);
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingDto approveBooking(
+    public BookingResponseDto updateBookingStatus(
             @PathVariable Long bookingId,
             @RequestParam Boolean approved,
             @RequestHeader(RESPONSE_HEADER) Long ownerId) {
-        return bookingService.approveBooking(bookingId, approved, ownerId);
+        return bookingService.updateBookingStatus(bookingId, approved, ownerId);
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDto getBookingById(
+    public BookingResponseDto getBookingById(
             @PathVariable Long bookingId,
             @RequestHeader(RESPONSE_HEADER) Long userId) {
         return bookingService.getBookingById(bookingId, userId);
     }
 
+    @GetMapping
+    public Collection<BookingResponseDto> getBookingsByUser(
+            @RequestHeader(RESPONSE_HEADER) Long userId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size) {
 
+        checkParametersPagination(from, size);
+
+        return bookingService.getBookingsByUser(userId, state, from, size);
+    }
+
+    @GetMapping("/owner")
+    public Collection<BookingResponseDto> getBookingsByOwner(
+            @RequestHeader("X-Sharer-User-Id") Long ownerId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size) {
+
+        checkParametersPagination(from, size);
+        return bookingService.getBookingsByOwner(ownerId, state, from, size);
+    }
+
+    private void checkParametersPagination(Integer from, Integer size) {
+        if (from < 0 || size <= 0) {
+            throw new ValidationException("Параметры 'from' и 'size' должны быть положительными");
+        }
+    }
 }
 

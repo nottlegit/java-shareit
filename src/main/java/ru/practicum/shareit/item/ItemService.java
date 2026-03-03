@@ -34,7 +34,7 @@ public class ItemService {
     }
 
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
-        Item item = findItemById(itemId);
+        Item item = findItemByIdOrThrow(itemId);
         log.info("Найдена вещь: {}, владелец: {}", item, item.getOwner().getId());
 
         if (!item.getOwner().getId().equals(userId)) {
@@ -78,7 +78,7 @@ public class ItemService {
     }
 
     public ItemDto getItemById(Long itemId) {
-        Item item = findItemById(itemId);
+        Item item = findItemByIdOrThrow(itemId);
 
         return ItemMapper.toItemDto(item);
     }
@@ -101,11 +101,15 @@ public class ItemService {
                 .toList();
     }
 
-    private Item findItemById(Long itemId) {
+    public Item findItemByIdOrThrow(Long itemId) {
         return itemRepository.findById(itemId).orElseThrow(() ->
                 new NotFoundException(
                         String.format("Вещь с id: %d не найдена", itemId)
                 )
         );
+    }
+
+    public Collection<Item> findByOwnerId(Long ownerId) {
+        return itemRepository.findByOwnerIdOrderById(ownerId);
     }
 }
