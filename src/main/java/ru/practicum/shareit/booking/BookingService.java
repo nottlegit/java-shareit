@@ -139,6 +139,6 @@ public class BookingService {
     }
 
     private Pageable getPageable(Integer from, Integer size) {
-        return PageRequest.of(from/size, size);
+        return PageRequest.of(from / size, size);
     }
 }

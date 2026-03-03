@@ -71,14 +71,4 @@ public class BookingMapper {
                 booking.getItem().getId()
         );
     }
-
-    public static Collection<BookingDto> toBookingDtoList(Collection<Booking> bookings) {
-        if (bookings == null) {
-            return null;
-        }
-
-        return bookings.stream()
-                .map(BookingMapper::toBookingDto)
-                .collect(Collectors.toList());
-    }
 }
