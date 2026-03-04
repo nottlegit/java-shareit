@@ -58,17 +58,4 @@ public class BookingMapper {
                 .map(BookingMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
-
-    public static BookingDto toBookingDto(Booking booking) {
-        if (booking == null) {
-            return null;
-        }
-
-        return new BookingDto(
-                booking.getId(),
-                booking.getStart(),
-                booking.getEnd(),
-                booking.getItem().getId()
-        );
-    }
 }

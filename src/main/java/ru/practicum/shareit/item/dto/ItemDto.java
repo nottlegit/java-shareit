@@ -4,10 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import ru.practicum.shareit.booking.dto.BookingShort;
+import ru.practicum.shareit.item.comment.CommentDto;
 
-/**
- * TODO Sprint add-controllers.
- */
+import java.util.Collection;
+
 @Data
 @Builder(toBuilder = true)
 public class ItemDto {
@@ -21,4 +22,8 @@ public class ItemDto {
 
     @NotNull(message = "Статус должен быть указан")
     private Boolean available;
+
+    private Collection<CommentDto> comments;
+    private BookingShort lastBooking;
+    private BookingShort nextBooking;
 }

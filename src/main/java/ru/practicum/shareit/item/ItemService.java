@@ -3,15 +3,21 @@ package ru.practicum.shareit.item;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.comment.*;
 import ru.practicum.shareit.item.dal.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,6 +26,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ItemService {
     private final ItemRepository itemRepository;
+    private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
     private final UserService userService;
 
     public ItemDto createItem(Long userId, ItemDto itemDto) {
@@ -77,10 +85,14 @@ public class ItemService {
         return result;
     }
 
-    public ItemDto getItemById(Long itemId) {
+    public ItemDto getItemById(Long itemId, Long userId) {
         Item item = findItemByIdOrThrow(itemId);
+        List<Booking> bookings = bookingRepository.findByItemIdAndStatusNotOrderByStart(
+                item.getId(), BookingStatus.WAITING
+        );
+        List<Comment> comments = commentRepository.findByItemId(itemId);
 
-        return ItemMapper.toItemDto(item);
+        return ItemMapper.toItemDto(item, userId, bookings, comments);
     }
 
     public Collection<ItemDto> getItemsByOwner(Long userId) {
@@ -99,6 +111,33 @@ public class ItemService {
         return itemRepository.searchAvailableItems(text).stream()
                 .map(ItemMapper::toItemDto)
                 .toList();
+    }
+
+    public CommentDto addComment(Long itemId, Long userId, CommentCreateDto commentCreateDto) {
+        log.info("Получен запрос на добавление комментария, userId: {}, itemId: {}, comment: {}",
+                userId, itemId, commentCreateDto);
+
+        Item item = findItemByIdOrThrow(itemId);
+        User author = userService.findUserByIdOrThrow(userId);
+
+        boolean authorHasBooking = bookingRepository.existsByBookerIdAndItemIdAndEndBefore(
+                userId, itemId, LocalDateTime.now()
+        );
+
+        if (!authorHasBooking) {
+            throw new IllegalArgumentException("Нельзя оставить комментарий, если пользователь не брал вещь в аренду");
+        }
+
+        Comment comment = Comment.builder()
+                .text(commentCreateDto.getText())
+                .item(item)
+                .author(author)
+                .created(LocalDateTime.now())
+                .build();
+
+        comment = commentRepository.save(comment);
+
+        return CommentMapper.toCommentDto(comment);
     }
 
     public Item findItemByIdOrThrow(Long itemId) {
