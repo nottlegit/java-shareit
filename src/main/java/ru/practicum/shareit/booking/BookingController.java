@@ -15,12 +15,12 @@ import java.util.Collection;
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
 public class BookingController {
-    private final String RESPONSE_HEADER = "X-Sharer-User-Id";
+    private final String X_SHARER_USER_ID = "X-Sharer-User-Id";
     private final BookingService bookingService;
 
     @PostMapping
     public BookingResponseDto createBooking(
-            @RequestHeader(RESPONSE_HEADER) Long userId,
+            @RequestHeader(X_SHARER_USER_ID) Long userId,
             @RequestBody @Valid BookingDto bookingDto) {
         log.info("Получен запрос от пользователя: {}. На бронирование вещи: {}.", userId, bookingDto.getItemId());
         return bookingService.createBooking(bookingDto, userId);
@@ -30,20 +30,20 @@ public class BookingController {
     public BookingResponseDto updateBookingStatus(
             @PathVariable Long bookingId,
             @RequestParam Boolean approved,
-            @RequestHeader(RESPONSE_HEADER) Long ownerId) {
+            @RequestHeader(X_SHARER_USER_ID) Long ownerId) {
         return bookingService.updateBookingStatus(bookingId, approved, ownerId);
     }
 
     @GetMapping("/{bookingId}")
     public BookingResponseDto getBookingById(
             @PathVariable Long bookingId,
-            @RequestHeader(RESPONSE_HEADER) Long userId) {
+            @RequestHeader(X_SHARER_USER_ID) Long userId) {
         return bookingService.getBookingById(bookingId, userId);
     }
 
     @GetMapping
     public Collection<BookingResponseDto> getBookingsByUser(
-            @RequestHeader(RESPONSE_HEADER) Long userId,
+            @RequestHeader(X_SHARER_USER_ID) Long userId,
             @RequestParam(defaultValue = "ALL") String state,
             @RequestParam(defaultValue = "0") Integer from,
             @RequestParam(defaultValue = "10") Integer size) {
