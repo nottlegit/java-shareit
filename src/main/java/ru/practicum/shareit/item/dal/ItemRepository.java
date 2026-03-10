@@ -1,31 +1,23 @@
 package ru.practicum.shareit.item.dal;
 
-import lombok.AllArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
 
 @Repository
-@AllArgsConstructor
-public class ItemRepository {
-    private final Map<Long, Item> items;
+public interface ItemRepository extends JpaRepository<Item, Long> {
+    Collection<Item> findByOwnerId(Long ownerId);
 
-    public Item save(Item item) {
-        if (item.getId() == null) {
-            throw new IllegalArgumentException("ID не может быть null");
-        }
-        items.put(item.getId(), item);
-        return item;
-    }
+    @Query("SELECT i FROM Item i " +
+            "WHERE i.available = true AND " +
+            "(LOWER(i.name) LIKE LOWER(CONCAT('%', :text, '%')) OR " +
+            "LOWER(i.description) LIKE LOWER(CONCAT('%', :text, '%')))"
 
-    public Optional<Item> findOne(Long itemId) {
-        return Optional.ofNullable(items.get(itemId));
-    }
+    )
+    Collection<Item> searchAvailableItems(String text);
 
-    public Collection<Item> findAll() {
-        return items.values();
-    }
+    Collection<Item> findByOwnerIdOrderById(Long ownerId);
 }

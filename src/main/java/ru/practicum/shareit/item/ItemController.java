@@ -3,13 +3,12 @@ package ru.practicum.shareit.item;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.comment.CommentCreateDto;
+import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.Collection;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
@@ -22,6 +21,14 @@ public class ItemController {
         return itemService.createItem(userId, itemDto);
     }
 
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(
+            @PathVariable Long itemId,
+            @RequestHeader(REQUEST_HEADER) Long userId,
+            @Valid @RequestBody CommentCreateDto commentCreateDto) {
+        return itemService.addComment(itemId, userId, commentCreateDto);
+    }
+
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@RequestHeader(REQUEST_HEADER) Long userId,
                               @PathVariable Long itemId,
@@ -30,8 +37,10 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable Long itemId) {
-        return itemService.getItemById(itemId);
+    public ItemDto getItemById(
+            @RequestHeader(REQUEST_HEADER) Long userId,
+            @PathVariable Long itemId) {
+        return itemService.getItemById(itemId, userId);
     }
 
     @GetMapping

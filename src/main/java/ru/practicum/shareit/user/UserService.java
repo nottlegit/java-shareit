@@ -1,6 +1,8 @@
 package ru.practicum.shareit.user;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.DuplicateEmailException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -9,27 +11,26 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicLong;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final AtomicLong idGenerator = new AtomicLong(0);
 
     public UserDto createUser(UserDto userDto) {
-        userRepository.findByEmail(userDto.getEmail()).ifPresent(u -> {
+        if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new DuplicateEmailException("Данный email уже используется");
-        });
+        }
 
-        User user = UserMapper.updateUserFields(idGenerator.getAndIncrement(), userDto);
+        User user = UserMapper.mapToUser(userDto);
 
         user = userRepository.save(user);
         return UserMapper.mapToUserDto(user);
     }
 
     public UserDto updateUser(Long userId, UserDto userDto) {
-        User existingUser = userRepository.findOne(userId).orElseThrow(() ->
+        User existingUser = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(
                         String.format("Пользователь с id: %d не найден", userId)
                 )
@@ -49,17 +50,13 @@ public class UserService {
             existingUser.setEmail(userDto.getEmail());
         }
 
-        User updatedUser = userRepository.update(existingUser);
+        User updatedUser = userRepository.save(existingUser);
 
         return UserMapper.mapToUserDto(updatedUser);
     }
 
     public UserDto getUserById(Long userId) {
-        User user = userRepository.findOne(userId).orElseThrow(() ->
-                new NotFoundException(
-                        String.format("Пользователь с id: %d не найден", userId)
-                )
-        );
+        User user = findUserByIdOrThrow(userId);
 
         return UserMapper.mapToUserDto(user);
     }
@@ -70,13 +67,24 @@ public class UserService {
                 .toList();
     }
 
+    @Transactional
     public void deleteUser(Long userId) {
-        userRepository.findOne(userId).orElseThrow(() ->
+        log.info("Получен запрос на удаление пользователя с ID: {}", userId);
+
+        User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(
                         String.format("Пользователь с id: %d не найден", userId)
                 )
         );
 
-        userRepository.delete(userId);
+        userRepository.delete(user);
+    }
+
+    public User findUserByIdOrThrow(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException(
+                        String.format("Пользователь с id: %d не найден", userId)
+                )
+        );
     }
 }
