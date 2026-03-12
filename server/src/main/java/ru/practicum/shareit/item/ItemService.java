@@ -151,4 +151,12 @@ public class ItemService {
     public Collection<Item> findByOwnerId(Long ownerId) {
         return itemRepository.findByOwnerIdOrderById(ownerId);
     }
+
+    public Collection<Item> findByRequestIdIn(Collection<Long> requestIds) {
+        return itemRepository.findByRequestIdIn(requestIds);
+    }
+
+    public Collection<Item> findByRequestId(Long requestId) {
+        return itemRepository.findByRequestId(requestId);
+    }
 }
