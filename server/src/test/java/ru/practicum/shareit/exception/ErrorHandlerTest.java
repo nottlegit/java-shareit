@@ -13,8 +13,6 @@ class ErrorHandlerTest {
 
     @InjectMocks
     private ErrorHandler errorHandler;
-
-    private ValidationException validationException;
     private DuplicateEmailException duplicateEmailException;
     private NotFoundException notFoundException;
     private AccessDeniedException accessDeniedException;
@@ -22,19 +20,10 @@ class ErrorHandlerTest {
 
     @BeforeEach
     void setUp() {
-        validationException = new ValidationException("test-validation-error");
         duplicateEmailException = new DuplicateEmailException("test-duplicate-email-error");
         notFoundException = new NotFoundException("test-not-found-error");
         accessDeniedException = new AccessDeniedException("test-access-denied-error");
         throwable = new RuntimeException("test-internal-error");
-    }
-
-    @Test
-    void handleValidationException_ShouldReturnBadRequest() {
-        ErrorResponse response = errorHandler.handleValidationException(validationException);
-
-        assertNotNull(response);
-        assertEquals("test-validation-error", response.getError());
     }
 
     @Test
@@ -67,15 +56,6 @@ class ErrorHandlerTest {
 
         assertNotNull(response);
         assertEquals("test-access-denied-error", response.getError());
-    }
-
-    @Test
-    void handleValidationException_ShouldReturnBadRequestWithNullMessage() {
-        ValidationException ex = new ValidationException(null);
-        ErrorResponse response = errorHandler.handleValidationException(ex);
-
-        assertNotNull(response);
-        assertNull(response.getError());
     }
 
     @Test

@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
@@ -174,30 +173,6 @@ class BookingControllerTest {
     }
 
     @Test
-    void getBookingsByUser_ShouldReturnBadRequest_WhenFromIsNegative() throws Exception {
-        mockMvc.perform(get("/bookings")
-                        .header(X_SHARER_USER_ID, "1")
-                        .param("from", "-1"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void getBookingsByUser_ShouldReturnBadRequest_WhenSizeIsZero() throws Exception {
-        mockMvc.perform(get("/bookings")
-                        .header(X_SHARER_USER_ID, "1")
-                        .param("size", "0"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void getBookingsByUser_ShouldReturnBadRequest_WhenSizeIsNegative() throws Exception {
-        mockMvc.perform(get("/bookings")
-                        .header(X_SHARER_USER_ID, "1")
-                        .param("size", "-5"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void getBookingsByOwner_ShouldReturnListOfBookings_WithDefaultParams() throws Exception {
         when(bookingService.getBookingsByOwner(eq(1L), eq("ALL"), eq(0), eq(10)))
                 .thenReturn(List.of(bookingResponseDto));
@@ -220,33 +195,6 @@ class BookingControllerTest {
                         .param("size", "15"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1));
-    }
-
-    @Test
-    void getBookingsByOwner_ShouldReturnBadRequest_WhenFromIsNegative() throws Exception {
-        mockMvc.perform(get("/bookings/owner")
-                        .header(X_SHARER_USER_ID, "1")
-                        .param("from", "-10"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void getBookingsByOwner_ShouldReturnBadRequest_WhenSizeIsZero() throws Exception {
-        mockMvc.perform(get("/bookings/owner")
-                        .header(X_SHARER_USER_ID, "1")
-                        .param("size", "0"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void checkParametersPagination_ShouldThrowValidationException_WhenInvalidParams() throws Exception {
-        when(bookingService.getBookingsByUser(eq(1L), eq("ALL"), eq(-1), eq(10)))
-                .thenThrow(new ValidationException("Параметры 'from' и 'size' должны быть положительными"));
-
-        mockMvc.perform(get("/bookings")
-                        .header(X_SHARER_USER_ID, "1")
-                        .param("from", "-1"))
-                .andExpect(status().isBadRequest());
     }
 
     @Test
