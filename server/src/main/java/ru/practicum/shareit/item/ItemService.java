@@ -113,10 +113,6 @@ public class ItemService {
     }
 
     public Collection<ItemDto> searchItems(String text) {
-        if (text == null || text.isBlank()) {
-            return List.of();
-        }
-
         return itemRepository.searchAvailableItems(text).stream()
                 .map(ItemMapper::toItemDto)
                 .toList();

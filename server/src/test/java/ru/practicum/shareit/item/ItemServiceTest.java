@@ -427,16 +427,6 @@ class ItemServiceTest {
     }
 
     @Test
-    void searchItems_ShouldReturnEmptyList_WhenTextIsBlank() {
-        Collection<ItemDto> result = itemService.searchItems("   ");
-
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-
-        verify(itemRepository, never()).searchAvailableItems(anyString());
-    }
-
-    @Test
     void searchItems_ShouldReturnEmptyList_WhenNoMatchesFound() {
         when(itemRepository.searchAvailableItems(anyString())).thenReturn(List.of());
 

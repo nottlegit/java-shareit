@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.comment.dto.CommentCreateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/items")
@@ -61,6 +63,10 @@ public class ItemController {
             @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
             @Positive @RequestParam(defaultValue = "20") Integer size) {
         log.info("Getting items by request: {}", text);
+        if (text == null || text.isBlank()) {
+            return ResponseEntity.ok().body(List.of());
+        }
+
         return itemClient.searchItems(text, from, size);
     }
 
