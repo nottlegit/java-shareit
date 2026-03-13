@@ -12,6 +12,9 @@ import ru.practicum.shareit.item.comment.*;
 import ru.practicum.shareit.item.dal.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.ItemRequestRepository;
+import ru.practicum.shareit.request.ItemRequestService;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -29,12 +32,19 @@ public class ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final UserService userService;
+    private final ItemRequestRepository requestRepository;
 
     public ItemDto createItem(Long userId, ItemDto itemDto) {
         UserDto userDto = userService.getUserById(userId);
         log.info("Пользователь найден: {}", userDto);
 
         Item item = ItemMapper.toItem(itemDto, UserMapper.mapToUser(userDto));
+
+        if (itemDto.getRequestId() != null) {
+            ItemRequest request = getRequestById(itemDto.getRequestId());
+            item.setRequest(request);
+        }
+
         item = itemRepository.save(item);
 
         log.info("Вещь создана с id: {}", item.getId());
@@ -158,5 +168,10 @@ public class ItemService {
 
     public Collection<Item> findByRequestId(Long requestId) {
         return itemRepository.findByRequestId(requestId);
+    }
+
+    private ItemRequest getRequestById(Long requestId) {
+        return requestRepository.findById(requestId).orElseThrow(
+                () -> new NotFoundException("Запрос с id " + requestId + " не найден"));
     }
 }

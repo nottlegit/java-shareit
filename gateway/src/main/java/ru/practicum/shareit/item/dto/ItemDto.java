@@ -25,6 +25,7 @@ public class ItemDto {
     private Collection<CommentDto> comments;
     private BookingShort lastBooking;
     private BookingShort nextBooking;
+    private Long requestId;
 
     @Getter
     @Setter
