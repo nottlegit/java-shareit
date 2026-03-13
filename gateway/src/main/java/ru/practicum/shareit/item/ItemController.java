@@ -19,11 +19,11 @@ import ru.practicum.shareit.item.dto.ItemDto;
 public class ItemController {
 
     private final ItemClient itemClient;
-    private final String X_SHARER_USER_ID = "X-Sharer-User-Id";
+    private final String xSharerUserId = "X-Sharer-User-Id";
 
     @PostMapping
     public ResponseEntity<Object> createItem(
-            @RequestHeader(X_SHARER_USER_ID) Long userId,
+            @RequestHeader(xSharerUserId) Long userId,
             @RequestBody @Valid ItemDto itemDto) {
         log.info("Post new item. Item is {}, owner id is {}", itemDto.getName(), userId);
         return itemClient.createItem(userId, itemDto);
@@ -31,7 +31,7 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<Object> getItemsByOwner(
-            @RequestHeader(X_SHARER_USER_ID) Long userId,
+            @RequestHeader(xSharerUserId) Long userId,
             @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
             @Positive @RequestParam(defaultValue = "20") Integer size) {
         log.info("Getting all items for user with id = {}", userId);
@@ -40,7 +40,7 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     public ResponseEntity<Object> getItemById(
-            @RequestHeader(X_SHARER_USER_ID) Long userId,
+            @RequestHeader(xSharerUserId) Long userId,
             @PathVariable Long itemId) {
         log.info("Getting information about item with id = {} for user {}", itemId, userId);
         return itemClient.getItem(itemId, userId);
@@ -48,7 +48,7 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<Object> updateItem(
-            @RequestHeader(X_SHARER_USER_ID) Long userId,
+            @RequestHeader(xSharerUserId) Long userId,
             @PathVariable Long itemId,
             @RequestBody ItemDto itemDto) {
         log.info("Edit item with id {}, owner id is {}", itemId, userId);
@@ -67,7 +67,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> addComment(
             @PathVariable Long itemId,
-            @RequestHeader(X_SHARER_USER_ID) Long userId,
+            @RequestHeader(xSharerUserId) Long userId,
             @RequestBody @Valid CommentCreateDto commentDto) {
         log.info("Adding comment to item {} by user {}", itemId, userId);
         return itemClient.addComment(itemId, userId, commentDto);

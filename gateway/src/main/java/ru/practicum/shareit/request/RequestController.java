@@ -18,25 +18,25 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 public class RequestController {
 
     private final ItemRequestClient itemRequestClient;
-    private final String X_SHARER_USER_ID = "X-Sharer-User-Id";
+    private final String xSharerUserId = "X-Sharer-User-Id";
 
     @PostMapping
     public ResponseEntity<Object> createRequest(
-            @RequestHeader(X_SHARER_USER_ID) Long userId,
+            @RequestHeader(xSharerUserId) Long userId,
             @RequestBody @Valid ItemRequestDto requestDto) {
         log.info("Creating request from user {}: {}", userId, requestDto.getDescription());
         return itemRequestClient.createRequest(userId, requestDto);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getOwnRequests(@RequestHeader(X_SHARER_USER_ID) Long userId) {
+    public ResponseEntity<Object> getOwnRequests(@RequestHeader(xSharerUserId) Long userId) {
         log.info("Getting requests from user {}", userId);
         return itemRequestClient.getOwnRequests(userId);
     }
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAllRequests(
-            @RequestHeader(X_SHARER_USER_ID) Long userId,
+            @RequestHeader(xSharerUserId) Long userId,
             @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
             @Positive @RequestParam(defaultValue = "20") Integer size) {
         log.info("Getting all requests for user {}, from={}, size={}", userId, from, size);
@@ -45,7 +45,7 @@ public class RequestController {
 
     @GetMapping("/{requestId}")
     public ResponseEntity<Object> getRequestById(
-            @RequestHeader(X_SHARER_USER_ID) Long userId,
+            @RequestHeader(xSharerUserId) Long userId,
             @PathVariable Long requestId) {
         log.info("Getting request {} for user {}", requestId, userId);
         return itemRequestClient.getRequestById(userId, requestId);
