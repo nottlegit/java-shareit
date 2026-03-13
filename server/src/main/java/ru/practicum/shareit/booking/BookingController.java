@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
-import ru.practicum.shareit.exception.ValidationException;
 
 import java.util.Collection;
 
@@ -47,9 +46,6 @@ public class BookingController {
             @RequestParam(defaultValue = "ALL") String state,
             @RequestParam(defaultValue = "0") Integer from,
             @RequestParam(defaultValue = "10") Integer size) {
-
-        checkParametersPagination(from, size);
-
         return bookingService.getBookingsByUser(userId, state, from, size);
     }
 
@@ -59,14 +55,6 @@ public class BookingController {
             @RequestParam(defaultValue = "ALL") String state,
             @RequestParam(defaultValue = "0") Integer from,
             @RequestParam(defaultValue = "10") Integer size) {
-
-        checkParametersPagination(from, size);
         return bookingService.getBookingsByOwner(ownerId, state, from, size);
-    }
-
-    private void checkParametersPagination(Integer from, Integer size) {
-        if (from < 0 || size <= 0) {
-            throw new ValidationException("Параметры 'from' и 'size' должны быть положительными");
-        }
     }
 }

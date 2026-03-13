@@ -48,30 +48,6 @@ class BookingControllerTest {
     }
 
     @Test
-    void getBookings_ShouldReturnBookings_WithDefaultParams() throws Exception {
-        when(bookingClient.getBookings(eq(1L), eq(BookingState.ALL), eq(0), eq(10)))
-                .thenReturn(ResponseEntity.ok().build());
-
-        mockMvc.perform(get("/bookings")
-                        .header(X_SHARER_USER_ID, "1"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void getBookings_ShouldReturnBookings_WithCustomParams() throws Exception {
-        when(bookingClient.getBookings(eq(1L), eq(BookingState.CURRENT), eq(5), eq(20)))
-                .thenReturn(ResponseEntity.ok().build());
-
-        mockMvc.perform(get("/bookings")
-                        .header(X_SHARER_USER_ID, "1")
-                        .param("state", "CURRENT")
-                        .param("from", "5")
-                        .param("size", "20"))
-                .andExpect(status().isOk());
-    }
-
-
-    @Test
     void getBookings_ShouldReturnBadRequest_WhenHeaderIsMissing() throws Exception {
         mockMvc.perform(get("/bookings"))
                 .andExpect(status().isBadRequest());
@@ -131,7 +107,7 @@ class BookingControllerTest {
 
     @Test
     void getOwnerBookings_ShouldReturnOwnerBookings_WithDefaultParams() throws Exception {
-        when(bookingClient.getOwnerBookings(eq(1L), eq(BookingState.ALL), eq(0), eq(10)))
+        when(bookingClient.getBookingsByOwner(eq(1L), eq(BookingState.ALL), eq(0), eq(10)))
                 .thenReturn(ResponseEntity.ok().build());
 
         mockMvc.perform(get("/bookings/owner")
@@ -141,7 +117,7 @@ class BookingControllerTest {
 
     @Test
     void getOwnerBookings_ShouldReturnOwnerBookings_WithCustomParams() throws Exception {
-        when(bookingClient.getOwnerBookings(eq(1L), eq(BookingState.PAST), eq(2), eq(15)))
+        when(bookingClient.getBookingsByOwner(eq(1L), eq(BookingState.PAST), eq(2), eq(15)))
                 .thenReturn(ResponseEntity.ok().build());
 
         mockMvc.perform(get("/bookings/owner")

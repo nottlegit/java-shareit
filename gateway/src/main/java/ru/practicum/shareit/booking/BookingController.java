@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.practicum.shareit.booking.dto.BookItemRequestDto;
 import ru.practicum.shareit.booking.dto.BookingState;
+import ru.practicum.shareit.exception.ValidationException;
 
 
 @Controller
@@ -24,14 +25,16 @@ public class BookingController {
 	private final String xSharerUserId = "X-Sharer-User-Id";
 
 	@GetMapping
-	public ResponseEntity<Object> getBookings(@RequestHeader(xSharerUserId) long userId,
+	public ResponseEntity<Object> getBookingsByUser(@RequestHeader(xSharerUserId) long userId,
 			@RequestParam(name = "state", defaultValue = "all") String stateParam,
 			@PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
 			@Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
 		BookingState state = BookingState.from(stateParam)
 				.orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
 		log.info("Get booking with state {}, userId={}, from={}, size={}", stateParam, userId, from, size);
-		return bookingClient.getBookings(userId, state, from, size);
+
+		checkParametersPagination(from, size);
+		return bookingClient.getBookingsByUser(userId, state, from, size);
 	}
 
 	@PostMapping
@@ -49,14 +52,16 @@ public class BookingController {
 	}
 
 	@GetMapping("/owner")
-	public ResponseEntity<Object> getOwnerBookings(@RequestHeader(xSharerUserId) long userId,
+	public ResponseEntity<Object> getBookingsByOwner(@RequestHeader(xSharerUserId) long userId,
 												   @RequestParam(name = "state", defaultValue = "ALL") String stateParam,
 												   @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
 												   @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
 		BookingState state = BookingState.from(stateParam)
 				.orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
 		log.info("Get owner bookings with state {}, userId={}, from={}, size={}", state, userId, from, size);
-		return bookingClient.getOwnerBookings(userId, state, from, size);
+
+		checkParametersPagination(from, size);
+		return bookingClient.getBookingsByOwner(userId, state, from, size);
 	}
 
 	@PatchMapping("/{bookingId}")
@@ -65,5 +70,11 @@ public class BookingController {
 												@RequestParam Boolean approved) {
 		log.info("Updating booking {}, userId={}, approved={}", bookingId, userId, approved);
 		return bookingClient.updateBooking(userId, bookingId, approved);
+	}
+
+	private void checkParametersPagination(Integer from, Integer size) {
+		if (from < 0 || size <= 0) {
+			throw new ValidationException("Параметры 'from' и 'size' должны быть положительными");
+		}
 	}
 }
